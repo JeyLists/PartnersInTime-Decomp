@@ -81,12 +81,8 @@ mwcc_path        = mwcc_root / MWCC_VERSION
 
 # Includes
 includes = [
-    str(root_path / "include")
+    str(root_path / "src")
 ]
-for root, dirs, _ in os.walk(libs_path):
-    for dir in dirs:
-        if dir == "include":
-            includes.append(Path(root) / dir)
 CC_INCLUDES = " ".join(f"-i {include}" for include in includes)
 
 
