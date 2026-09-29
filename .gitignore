@@ -17,4 +17,5 @@ build.ninja
 .ninja_lock
 /wibo
 tools/__pycache__/
+tools/mwccarm
 asm/
