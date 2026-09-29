@@ -16,6 +16,7 @@ typedef s32 fx32;
 #define FX32_CONST(x)       ((fx32)(x * (1 << FX32B_INT)))
 #define FX32_ONE            FX32_CONST(1.0f)
 
+#define FX32_TO_S32(value) ((s32)(value + ((u32)(value >> 0xb) >> 0x14)) >> 0xc)
 
 
 typedef s64 fx64;
@@ -48,18 +49,33 @@ typedef s64 fx64c;
 
 
 
-void FX_DivAsync(fx32 numer, fx32 denom);
-fx32 FX_GetDivResult();
-fx64c FX_GetDivResultFx64c();
-fx32 FX_Div(fx32 numer, fx32 denom);
-s32 FX_DivS32(s32 numer, s32 denom);
+typedef s16 fx16;
 
-void FX_SqrtAsync(fx32 x);
-fx32 FX_GetSqrtResult();
-fx32 FX_Sqrt(fx32 x);
 
-void FX_InvAsync(fx32 x);
-fx32 FX_Inv(fx32 x);
-fx32 FX_InvSqrt(fx32 x);
+void FX_divAsync(fx32 numer, fx32 denom);
+fx32 FX_getDivResult();
+fx64c FX_getDivResultFx64c();
+fx32 FX_div(fx32 numer, fx32 denom);
+s32 FX_divS32(s32 numer, s32 denom);
+
+void FX_sqrtAsync(fx32 x);
+fx32 FX_getSqrtResult();
+fx32 FX_sqrt(fx32 x);
+
+void FX_invAsync(fx32 x);
+fx32 FX_inv(fx32 x);
+fx32 FX_invSqrt(fx32 x);
+
+
+
+extern const fx16 FX_sinCosTable[];
+
+inline fx16 FX_sinIdx(int idx) {
+    return FX_sinCosTable[((idx >> 4) << 1)];
+}
+
+inline fx16 FX_cosIdx(int idx) {
+    return FX_sinCosTable[((idx >> 4) << 1) + 1];
+}
 
     #endif

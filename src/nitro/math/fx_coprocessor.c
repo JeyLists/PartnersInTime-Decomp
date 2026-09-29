@@ -11,7 +11,7 @@
 #define FX_DIV_HALF (FX_DIV_ONE >> 1)
 
 // Start fixed-point division using math coprocessor
-void FX_DivAsync(fx32 numer, fx32 denom) {
+void FX_divAsync(fx32 numer, fx32 denom) {
     *rDIVCNT = DIVCNT_MODE_64_32;
 
     // Shift numerator by 32 to avoid precision loss
@@ -20,7 +20,7 @@ void FX_DivAsync(fx32 numer, fx32 denom) {
 }
 
 // Get result of fixed-point division from math coprocessor
-fx32 FX_GetDivResult() {
+fx32 FX_getDivResult() {
     while (*rDIVCNT & DIVCNTF_BUSY) {}
 
     // Shift result back to account for precision loss prevention.
@@ -29,19 +29,19 @@ fx32 FX_GetDivResult() {
 }
 
 // Get result of fixed-point division from math coprocessor
-fx64c FX_GetDivResultFx64c() {
+fx64c FX_getDivResultFx64c() {
     while (*rDIVCNT & DIVCNTF_BUSY) {}
     return *rDIV_RESULT;
 }
 
 // Fixed-point division using math coprocessor
-fx32 FX_Div(fx32 numer, fx32 denom) {
-    FX_DivAsync(numer, denom);
-    return FX_GetDivResult();
+fx32 FX_div(fx32 numer, fx32 denom) {
+    FX_divAsync(numer, denom);
+    return FX_getDivResult();
 }
 
 // Signed integer modulo using math coprocessor
-s32 FX_ModS32(s32 numer, s32 denom) {
+s32 FX_modS32(s32 numer, s32 denom) {
     *rDIVCNT = DIVCNT_MODE_32_32;
     *rDIV_NUMER_L = (u32)numer;
     *rDIV_DENOM = (u32)denom;
@@ -62,7 +62,7 @@ s32 FX_ModS32(s32 numer, s32 denom) {
 #define FX_SQRT_HALF (FX_SQRT_ONE >> 1)
 
 // Start fixed-point square root using math coprocessor
-void FX_SqrtAsync(fx32 x) {
+void FX_sqrtAsync(fx32 x) {
     if (x > 0) {
         *rSQRTCNT = SQRTCNT_MODE_64;
 
@@ -76,7 +76,7 @@ void FX_SqrtAsync(fx32 x) {
 }
 
 // Get result of fixed-point square root from math coprocessor
-fx32 FX_GetSqrtResult(void) {
+fx32 FX_getSqrtResult(void) {
     while (*rSQRTCNT & SQRTCNTF_BUSY) {}
 
     // Shift result back to account for precision loss prevention.
@@ -85,42 +85,42 @@ fx32 FX_GetSqrtResult(void) {
 }
 
 // Fixed-point square root using math coprocessor
-fx32 FX_Sqrt(fx32 x) {
+fx32 FX_sqrt(fx32 x) {
     if (x <= 0) {
         return 0;
     }
 
     *rSQRTCNT = SQRTCNT_MODE_64;
     *rSQRT_PARAM = (u64)x << 32;
-    return FX_GetSqrtResult();
+    return FX_getSqrtResult();
 }
 
 
 
 // Start calculating 1.0 / x using math coprocessor
-void FX_InvAsync(fx32 x) {
+void FX_invAsync(fx32 x) {
     *rDIVCNT = DIVCNT_MODE_64_32;
     *rDIV_NUMER = (u64)FX32_ONE << 32;
     *rDIV_DENOM = (u32)x;
 }
 
 // Calculate 1.0 / x using math coprocessor
-fx32 FX_Inv(fx32 x) {
-    FX_InvAsync(x);
-    return FX_GetDivResult();
+fx32 FX_inv(fx32 x) {
+    FX_invAsync(x);
+    return FX_getDivResult();
 }
 
 // Calculate the inverse square root of x using math coprocessor
-fx32 FX_InvSqrt(fx32 x) {
+fx32 FX_invSqrt(fx32 x) {
     fx64c divResult;
     s64 sqrtResult;
     s64 invSqrtResult;
 
     if (x > 0) {
-        FX_InvAsync(x);
-        FX_SqrtAsync(x);
+        FX_invAsync(x);
+        FX_sqrtAsync(x);
 
-        divResult = FX_GetDivResultFx64c();
+        divResult = FX_getDivResultFx64c();
         while (*rSQRTCNT & SQRTCNTF_BUSY) {}
         sqrtResult = *(s32*)rSQRT_RESULT;
 
