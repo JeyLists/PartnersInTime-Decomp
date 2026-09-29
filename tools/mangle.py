@@ -23,7 +23,7 @@ else: cc = ['wine', str(cc_path)]
 args = parser.parse_args()
 
 cc.extend([
-    '-enum', 'int',
+    '-enum', 'min',
     '-char', 'signed',
     '-proc', 'arm946e',
     '-gccext,on',

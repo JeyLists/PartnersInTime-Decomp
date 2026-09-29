@@ -30,7 +30,7 @@ MWCC_VERSION = "1.2/base"
 DECOMP_ME_COMPILER = "mwcc_20_72"
 CC_FLAGS = " ".join([
     "-O4,p",                # Optimize maximally for performance
-    "-enum int",            # Use int-sized enums
+    "-enum min",            # Use int-sized enums
     "-char signed",         # Char type is signed
     "-str noreuse",         # Equivalent strings are different objects
     "-proc arm946e",        # Target processor
