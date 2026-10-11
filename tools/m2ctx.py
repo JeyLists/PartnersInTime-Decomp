@@ -43,11 +43,12 @@ includes = re.findall(INCLUDE_REGEX, contents, flags=re.MULTILINE)
 
 _, suffix = os.path.splitext(args.file)
 
-with tempfile.NamedTemporaryFile(delete=True, suffix=suffix) as tmp_file:
+with tempfile.TemporaryDirectory() as tmp_dir:
+    tmp_path = Path(tmp_dir) / f'context{suffix}'
     # Write includes
-    for include in includes:
-        tmp_file.write(f'#include {include}\n'.encode())
-    tmp_file.flush()
+    with tmp_path.open('wb') as tmp_file:
+        for include in includes:
+            tmp_file.write(f'#include {include}\n'.encode())
 
     # Run preprocessor
     try:
@@ -55,7 +56,7 @@ with tempfile.NamedTemporaryFile(delete=True, suffix=suffix) as tmp_file:
             'gcc',
             '-E', '-P', '-fworking-directory', '-undef', '-dD',
             *CXX_FLAGS,
-            tmp_file.name
+            str(tmp_path)
         ], cwd=root_dir, encoding=args.encoding)
     except subprocess.CalledProcessError as e:
         eprint(f"Failed to preprocess '{args.file}'")

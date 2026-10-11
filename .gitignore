@@ -19,3 +19,4 @@ build.ninja
 tools/__pycache__/
 tools/mwccarm
 asm/
+PartnersInTime-Decomp.*

@@ -195,6 +195,14 @@ def main():
         )
         n.newline()
 
+        n.rule(
+            name="rtti_scan",
+            command=f'"{PYTHON}" tools/rtti_scan.py "$extract_path" --output "$out"',
+            description="List RTTI classes",
+            restat=True,
+        )
+        n.newline()
+
         # -MMD excludes all includes instead of just system includes for some reason, so use -MD instead.
         mwcc_cmd = f'{WINE} "{CC}" {CC_FLAGS} {CC_INCLUDES} $cc_flags -d $game_version -MD -c $in -o $basedir'
         mwcc_implicit = [CC]
@@ -271,6 +279,7 @@ def main():
 
         add_download_tool_builds(n)
         add_extract_build(n, project)
+        add_rtti_build(n, project)
         add_delink_and_lcf_builds(n, project)
         add_mwcc_builds(n, project, mwcc_implicit)
         add_mwld_and_rom_builds(n, project)
@@ -339,6 +348,32 @@ def add_extract_build(n: ninja_syntax.Writer, project: Project):
             }
         )
         n.newline()
+
+
+def add_rtti_build(n: ninja_syntax.Writer, project: Project):
+    report = str(project.game_extract / "rtti.txt")
+    binaries = [
+        str(path)
+        for path in project.game_extract.glob("arm[79]*/*")
+        if path.suffix in (".bin", ".yaml")
+    ]
+    n.build(
+        outputs=report,
+        rule="rtti_scan",
+        inputs=str(project.baserom_config()),
+        implicit=["tools/rtti_scan.py"] + binaries,
+        variables={
+            "extract_path": project.game_extract,
+        },
+    )
+    n.newline()
+
+    n.build(
+        outputs="rtti",
+        rule="phony",
+        inputs=report,
+    )
+    n.newline()
 
 
 def add_mwld_and_rom_builds(n: ninja_syntax.Writer, project: Project):
